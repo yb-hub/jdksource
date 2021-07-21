@@ -626,17 +626,22 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
         if ((tab = table) == null || (n = tab.length) == 0)
+            //如果数组为空，则初始化数组
             n = (tab = resize()).length;
         if ((p = tab[i = (n - 1) & hash]) == null)
+            //如果没有hash冲突，则创建node，并保存到table中（tab->table）
             tab[i] = newNode(hash, key, value, null);
         else {
+            //如果有hash冲突
             Node<K,V> e; K k;
+            //key相同,更新value值
             if (p.hash == hash &&
                 ((k = p.key) == key || (key != null && key.equals(k))))
                 e = p;
             else if (p instanceof TreeNode)
                 e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
             else {
+                //key不同，创建node,node.next->node,如果链表长度大于8,调整数组大小，如果大于64，则改为树结构
                 for (int binCount = 0; ; ++binCount) {
                     if ((e = p.next) == null) {
                         p.next = newNode(hash, key, value, null);
@@ -644,9 +649,11 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                             treeifyBin(tab, hash);
                         break;
                     }
+                    //链表中key相同
                     if (e.hash == hash &&
                         ((k = e.key) == key || (key != null && key.equals(k))))
                         break;
+                    //e=p.next
                     p = e;
                 }
             }
@@ -691,6 +698,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         else if (oldThr > 0) // initial capacity was placed in threshold
             newCap = oldThr;
         else {               // zero initial threshold signifies using defaults
+            //初始化数组，默认容量 1<<4=16,默认因子0.75,阈值为 16 * 0.75 = 12
             newCap = DEFAULT_INITIAL_CAPACITY;
             newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
         }
